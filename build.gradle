@@ -1,0 +1,105 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'org.example'
+version = findProperty('version') ?: '0.1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+application {
+    mainClass = 'org.example.TodoApp'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://plugins.gradle.org/m2/"
+    }
+    /*maven {
+        url = uri("https://maven.pkg.github.com/DER-2SH-KA/PR2_ISRPO_todo_app")
+        credentials {
+            username = project.findProperty("gpr.user") ?:
+                    System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?:
+                    System.getenv("GITHUB_TOKEN")
+        }
+    }*/
+
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // implementation 'org.example:todo-app:0.3.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set('todo-app')
+    archiveClassifier.set('') // no classifier: produce todo-app-<version>.jar
+    archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
+}
+
+tasks.jar {
+    enabled = false
+}
+
+tasks.named('distZip') {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.named('distTar') {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.named('startScripts') {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.named('startShadowScripts') {
+    dependsOn tasks.named('shadowJar')
+}
+
+tasks.build {
+    dependsOn shadowJar
+}
+
+tasks.wrapper {
+    gradleVersion = '8.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'org.example'
+            artifactId = 'todo-app'
+            version = project.version
+
+            artifact(tasks.shadowJar) {
+                classifier = null // имя вида todo-app-0.5.0.jar
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/DER-2SH-KA/PR2_ISRPO_todo_app")
+            credentials {
+                username = project.findProject("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProject("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
