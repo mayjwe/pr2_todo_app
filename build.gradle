@@ -22,17 +22,7 @@ repositories {
     maven {
         url = "https://plugins.gradle.org/m2/"
     }
-    /*maven {
-        url = uri("https://maven.pkg.github.com/DER-2SH-KA/PR2_ISRPO_todo_app")
-        credentials {
-            username = project.findProperty("gpr.user") ?:
-                    System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?:
-                    System.getenv("GITHUB_TOKEN")
-        }
-    }*/
-
-}
+ }
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
@@ -95,7 +85,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/DER-2SH-KA/PR2_ISRPO_todo_app")
+            url = uri("https://maven.pkg.github.com/mayjwe/pr2__todo_app")
             credentials {
                 username = project.findProject("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProject("gpr.key") ?: System.getenv("GITHUB_TOKEN")
